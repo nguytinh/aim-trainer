@@ -3,25 +3,33 @@
 <head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aim Training Game</title>
     <style>
         /* General body styling */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
-            background-color: #f0f4f8;
-            font-family: "Jacquarda Bastarda 9", serif;
+            background-image: url('{{ url_for('static', filename='empty_room3.jpg') }}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: "Chakra Petch", sans-serif;
             font-weight: 400;
             font-style: normal;
             color: #333;
             margin: 0;
             padding: 0;
-            text-align: center;
-            position: relative;
-            height: 100vh;
+            min-height: 85vh;
+            
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
         }
@@ -30,17 +38,17 @@
         #target {
             width: 80px;
             height: 80px;
-            background-color: #e74c3c;
+            border-radius: 50%;
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             cursor: pointer;
-            border-radius: 50%;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            transition: box-shadow 0.3s ease, width 0.1s ease, height 0.1s ease, transform 0.1s ease;
+            background: radial-gradient(circle at 30px 30px, #ff2b2b, rgb(62, 62, 62));
         }
-
+        
         /* Target hover effect */
         #target:hover {
             background-color: #c0392b;
@@ -49,8 +57,7 @@
 
         /* Score and Timer styling */
         #score, #timer {
-            font-size: 1.5rem;
-            font-family: "Jacquarda Bastarda 9", serif;
+            font-family: "Chakra Petch", sans-serif;
             font-weight: 400;
             font-style: normal;
             margin: 20px;
@@ -60,6 +67,16 @@
             border-radius: 0px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             display: inline-block;
+            position: fixed;
+            top: 20px;
+        }
+
+        #score {
+            left: 20px;
+        }
+
+        #timer {
+            right: 20px;
         }
 
         /* Responsive layout */
@@ -68,38 +85,66 @@
                 width: 80px;
                 height: 80px;
                 background: radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b);
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
                 cursor: pointer;
                 border-radius: 50%;
                 box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3), inset 0 -2px 5px rgba(0, 0, 0, 0.2);
-                transition: background-color 0.3s ease, box-shadow 0.3s ease;
+                transition: background-color 0.3s ease, box-shadow 0.3s ease, width 0.1s ease, height 0.1s ease;
             }
-
 
             #score, #timer {
                 font-size: 1.2rem;
                 margin: 10px;
+                padding: 8px 16px;
             }
         }
     </style>
 </head>
 <body>
-    <audio id="popSound" src="./pop.wav" preload="metadata"></audio>
+    <audio id="popSound" src="{{ url_for('static', filename='pop.mp3') }}" preload="metadata"></audio>
     <div id="target"></div>
     <div id="score">Score: 0</div>
     <div id="timer">Time Left: 30</div>
 
     <script>
+        // Parse query parameters to get difficulty
+        const urlParams = new URLSearchParams(window.location.search);
+        const difficulty = urlParams.get('difficulty') || 'medium'; // Default to medium
+
+        // Set game parameters based on difficulty
+        let initialTargetSize;
+        let shrinkIntervalTime;
+        let shrinkAmount;
+        let gameDuration = 30; // seconds
+
+        switch(difficulty) {
+            case 'easy':
+                initialTargetSize = 120; // Larger targets
+                shrinkIntervalTime = 100; // Shrink slower (in ms)
+                shrinkAmount = 1; // Shrink slower per tick
+                gameDuration = 45; // Optional: longer game time for easy
+                break;
+            case 'hard':
+                initialTargetSize = 80; // Same size as medium
+                shrinkIntervalTime = 50; // Shrink faster (in ms)
+                shrinkAmount = 4; // Shrink more per tick
+                gameDuration = 30; // Standard game time
+                break;
+            case 'medium':
+            default:
+                initialTargetSize = 80; // Standard size
+                shrinkIntervalTime = 80; // Standard shrink speed (in ms)
+                shrinkAmount = 3; // Standard shrink amount per tick
+                gameDuration = 30; // Standard game time
+        }
+
         let score = 0;
-        let timeLeft = 30;
-        let targetSize = 80; // Initial target size
+        let timeLeft = gameDuration;
+        let targetSize = initialTargetSize; // Initial target size based on difficulty
         const target = document.getElementById('target');
         const scoreDisplay = document.getElementById('score');
         const timerDisplay = document.getElementById('timer');
 
+        // Countdown timer for game duration
         const countdown = setInterval(() => {
             timeLeft -= 1;
             timerDisplay.innerText = `Time Left: ${timeLeft}`;
@@ -116,47 +161,50 @@
 
         const popSound = document.getElementById('popSound');
 
+        // Click event for the target
         target.onclick = function() {
-            console.log('Target clicked');
             score += 1;
             scoreDisplay.innerText = 'Score: ' + score;
-            console.log('About to play sound');
-            popSound.play().then(() => {
-                console.log('Sound played successfully');
-            }).catch((error) => {
-                console.error('Error playing sound:', error);
-            });
-            resetTarget(); // Reset target when clicked
+            popSound.play().then(() => {}).catch((error) => { console.error('Error playing sound:', error); });
+            resetTarget(); // Reset target position and size on click
         };
 
-
         function moveTarget() {
-            const x = Math.random() * (window.innerWidth - targetSize);
-            const y = Math.random() * (window.innerHeight - targetSize);
+            const scoreHeight = scoreDisplay.offsetHeight + 40;  // Extra padding to avoid overlap
+            const timerHeight = timerDisplay.offsetHeight + 40;  // Extra padding to avoid overlap
+        
+            // Define safe boundaries for spawning the target
+            const x = Math.random() * (window.innerWidth - targetSize - 40) + 20;  // Prevent overflow
+            const y = Math.random() * (window.innerHeight - targetSize - 40 - scoreHeight) + scoreHeight;  // Spawn target below the score/timer areas
+        
             target.style.left = x + 'px';
             target.style.top = y + 'px';
         }
+        
 
         function resetTarget() {
-            targetSize = 80; // Reset target size
+            targetSize = initialTargetSize; // Reset target size based on difficulty
             moveTarget();
-            shrinkTarget(); // Start shrinking immediately
         }
 
+        // Function to shrink the target at a constant speed
         function shrinkTarget() {
             const shrinkInterval = setInterval(() => {
-                targetSize -= 1;
-                target.style.width = `${targetSize}px`;
-                target.style.height = `${targetSize}px`;
-
                 if (targetSize <= 0) {
                     clearInterval(shrinkInterval);
-                    moveTarget(); // Move to a new target if the user didn't click
-                    targetSize = 80; // Reset target size
+                    resetTarget(); // Reset the target to its initial size and move it to a new position
+                    shrinkTarget(); // Restart the shrinking process for the new target
+                } else {
+                    targetSize -= shrinkAmount;
+                    target.style.width = `${targetSize}px`;
+                    target.style.height = `${targetSize}px`;
+                    target.style.transform = `translate(-50%, -50%)`; // Keep the target centered
                 }
-            }, 100); // Shrinks every 100ms
+            }, shrinkIntervalTime); // Shrink interval time is based on difficulty
         }
+        
 
+        // Submit the score to the leaderboard
         function submitScore(score) {
             const name = prompt('Enter your name for the leaderboard:');
             fetch('/submit-score', {
@@ -170,12 +218,17 @@
             .then(data => {
                 alert(data.message);
                 window.location.href = '/leaderboard';  // Redirect to leaderboard page
+            })
+            .catch(error => {
+                console.error('Error submitting score:', error);
+                alert('There was an error submitting your score. Please try again.');
+                window.location.href = '/leaderboard';  // Redirect to leaderboard page even if there's an error
             });
         }
 
         // Start the game
         moveTarget();
-        shrinkTarget(); // Start shrinking immediately
+        shrinkTarget(); // Start shrinking at a constant speed immediately
     </script>
 </body>
 </html>

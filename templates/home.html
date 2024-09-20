@@ -3,21 +3,53 @@
 <head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aim Training Game - Home</title>
     <style>
         /* General body styling */
+        /* General body styling */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            background-color: #f0f4f8;
-            font-family: "Jacquarda Bastarda 9", serif;
+            background-image: url('{{ url_for('static', filename='empty_room3.jpg') }}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: "Chakra Petch", sans-serif;
             font-weight: 400;
             font-style: normal;
             color: #333;
             margin: 0;
-            padding-top: 15%;
-            text-align: center;
+            padding: 0;
+            min-height: 85vh;
+            
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Floating animation */
+        @keyframes floating {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        div {
+            animation: floating 3s ease-in-out infinite;
         }
 
         /* Header styling */
@@ -28,9 +60,8 @@
         }
 
         /* Button styling */
-        button {
-            font-size: 1.2rem;
-            font-family: "Jacquarda Bastarda 9", serif;
+        button, select {
+            font-family: "Chakra Petch", sans-serif;
             font-weight: 400;
             font-style: normal;
             margin: 20px;
@@ -43,26 +74,55 @@
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
-        /* Hover and active states for buttons */
-        button:hover {
+        /* Hover and active states for buttons and dropdown */
+        button:hover, select:hover {
             background-color: #282828;
             transform: scale(1.05);
         }
 
-        button:active {
+        button:active, select:active {
             background-color: #505050;
             transform: scale(0.98);
         }
 
         /* Button focus outline removal */
-        button:focus {
+        button:focus, select:focus {
             outline: none;
         }
+
+        /* Dropdown container styling */
+        .dropdown {
+            margin: 20px;
+        }
+
+        /* Optional: Style the container for better layout */
+        .container {
+            text-align: center;
+        }
+
     </style>
 </head>
 <body>
-    <h1>Aim Training Game</h1>
-    <button onclick="location.href='/game'">Start Game</button>
-    <button onclick="location.href='/leaderboard'">View Leaderboard</button>
+    <div>
+        <h1>Aim Training Game</h1>
+        <div class="dropdown">
+            <label for="difficulty">Select Difficulty: </label>
+            <select id="difficulty">
+                <option value="easy">Easy</option>
+                <option value="medium" selected>Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+        </div>
+        <button onclick="startGame()">Start Game</button>
+        <button onclick="location.href='/leaderboard'">View Leaderboard</button>
+    </div>
+
+    <script>
+        function startGame() {
+            const difficulty = document.getElementById('difficulty').value;
+            // Redirect to the game page with the selected difficulty as a query parameter
+            window.location.href = `/game?difficulty=${difficulty}`;
+        }
+    </script>
 </body>
 </html>

@@ -3,15 +3,20 @@
 <head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leaderboard</title>
     <style>
         /* Leaderboard styles */
         body {
+            background-image: url('{{ url_for('static', filename='empty_room3.jpg') }}');
+            background-size: cover; /* Ensures the image covers the entire background */
+            background-position: center; /* Center the image */
+            background-repeat: no-repeat; /* Prevent the image from repeating */
+            background-attachment: fixed; /* Ensures the background stays fixed when scrolling */
             background-color: #f0f4f8;
-            font-family: "Jacquarda Bastarda 9", serif;
+            font-family: "Chakra Petch", sans-serif;
             font-weight: 400;
             font-style: normal;
             color: #333;
@@ -61,11 +66,10 @@
         button {
             display: inline-block;
             margin: 20px auto;
+            color: white;
             padding: 10px 20px;
             background-color: #505050;
-            color: white;
-            font-size: 1rem;
-            font-family: "Jacquarda Bastarda 9", serif;
+            font-family: "Chakra Petch", sans-serif;
             font-weight: 400;
             font-style: normal;
             border: none;
