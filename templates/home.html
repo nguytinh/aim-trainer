@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aim Training Game - Home</title>
+    <style>
+        /* General body styling */
+        body {
+            background-color: #f0f4f8;
+            font-family: "Jacquarda Bastarda 9", serif;
+            font-weight: 400;
+            font-style: normal;
+            color: #333;
+            margin: 0;
+            padding-top: 15%;
+            text-align: center;
+        }
+
+        /* Header styling */
+        h1 {
+            font-size: 2.8rem;
+            margin-top: 50px;
+            color: #2c3e50;
+        }
+
+        /* Button styling */
+        button {
+            font-size: 1.2rem;
+            font-family: "Jacquarda Bastarda 9", serif;
+            font-weight: 400;
+            font-style: normal;
+            margin: 20px;
+            padding: 15px 30px;
+            background-color: #505050;
+            color: white;
+            border: none;
+            border-radius: 0px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        /* Hover and active states for buttons */
+        button:hover {
+            background-color: #282828;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            background-color: #505050;
+            transform: scale(0.98);
+        }
+
+        /* Button focus outline removal */
+        button:focus {
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Aim Training Game</h1>
+    <button onclick="location.href='/game'">Start Game</button>
+    <button onclick="location.href='/leaderboard'">View Leaderboard</button>
+</body>
+</html>

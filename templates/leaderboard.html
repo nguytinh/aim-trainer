@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+    <style>
+        /* Leaderboard styles */
+        body {
+            background-color: #f0f4f8;
+            font-family: "Jacquarda Bastarda 9", serif;
+            font-weight: 400;
+            font-style: normal;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-top: 20px;
+            color: #2c3e50;
+        }
+
+        table {
+            margin: 40px auto;
+            border-collapse: collapse;
+            width: 60%;
+            max-width: 800px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 0px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px 20px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        th {
+            background-color: #505050;
+            color: white;
+            font-weight: bold;
+            letter-spacing: 0.05rem;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        tr:hover {
+            background-color: #e1ecf4;
+        }
+
+        button {
+            display: inline-block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #505050;
+            color: white;
+            font-size: 1rem;
+            font-family: "Jacquarda Bastarda 9", serif;
+            font-weight: 400;
+            font-style: normal;
+            border: none;
+            border-radius: 0px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #282828;
+        }
+
+        button:focus {
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Leaderboard</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody id="leaderboard"></tbody>
+    </table>
+
+    <button onclick="location.href='/'">Home</button>
+
+    <script>
+        function loadLeaderboard() {
+            fetch('/api/leaderboard')
+                .then(response => response.json())
+                .then(data => {
+                    const leaderboard = document.getElementById('leaderboard');
+                    leaderboard.innerHTML = '';  // Clear existing entries
+                    data.forEach(entry => {
+                        const tr = document.createElement('tr');
+                        const nameCell = document.createElement('td');
+                        const scoreCell = document.createElement('td');
+
+                        nameCell.textContent = entry.name;
+                        scoreCell.textContent = entry.score;
+
+                        tr.appendChild(nameCell);
+                        tr.appendChild(scoreCell);
+                        leaderboard.appendChild(tr);
+                    });
+                });
+        }
+
+        // Load the leaderboard when the page is ready
+        window.onload = loadLeaderboard;
+    </script>
+</body>
+</html>

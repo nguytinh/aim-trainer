@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aim Training Game</title>
+    <style>
+        /* General body styling */
+        body {
+            background-color: #f0f4f8;
+            font-family: "Jacquarda Bastarda 9", serif;
+            font-weight: 400;
+            font-style: normal;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Target styling */
+        #target {
+            width: 80px;
+            height: 80px;
+            background-color: #e74c3c;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Target hover effect */
+        #target:hover {
+            background-color: #c0392b;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Score and Timer styling */
+        #score, #timer {
+            font-size: 1.5rem;
+            font-family: "Jacquarda Bastarda 9", serif;
+            font-weight: 400;
+            font-style: normal;
+            margin: 20px;
+            background-color: #505050;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 0px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+        }
+
+        /* Responsive layout */
+        @media (max-width: 600px) {
+            #target {
+                width: 80px;
+                height: 80px;
+                background: radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b);
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                cursor: pointer;
+                border-radius: 50%;
+                box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3), inset 0 -2px 5px rgba(0, 0, 0, 0.2);
+                transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            }
+
+
+            #score, #timer {
+                font-size: 1.2rem;
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <audio id="popSound" src="./pop.wav" preload="metadata"></audio>
+    <div id="target"></div>
+    <div id="score">Score: 0</div>
+    <div id="timer">Time Left: 30</div>
+
+    <script>
+        let score = 0;
+        let timeLeft = 30;
+        let targetSize = 80; // Initial target size
+        const target = document.getElementById('target');
+        const scoreDisplay = document.getElementById('score');
+        const timerDisplay = document.getElementById('timer');
+
+        const countdown = setInterval(() => {
+            timeLeft -= 1;
+            timerDisplay.innerText = `Time Left: ${timeLeft}`;
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                endGame();
+            }
+        }, 1000);
+
+        function endGame() {
+            alert(`Game Over! Your score is: ${score}`);
+            submitScore(score);
+        }
+
+        const popSound = document.getElementById('popSound');
+
+        target.onclick = function() {
+            console.log('Target clicked');
+            score += 1;
+            scoreDisplay.innerText = 'Score: ' + score;
+            console.log('About to play sound');
+            popSound.play().then(() => {
+                console.log('Sound played successfully');
+            }).catch((error) => {
+                console.error('Error playing sound:', error);
+            });
+            resetTarget(); // Reset target when clicked
+        };
+
+
+        function moveTarget() {
+            const x = Math.random() * (window.innerWidth - targetSize);
+            const y = Math.random() * (window.innerHeight - targetSize);
+            target.style.left = x + 'px';
+            target.style.top = y + 'px';
+        }
+
+        function resetTarget() {
+            targetSize = 80; // Reset target size
+            moveTarget();
+            shrinkTarget(); // Start shrinking immediately
+        }
+
+        function shrinkTarget() {
+            const shrinkInterval = setInterval(() => {
+                targetSize -= 1;
+                target.style.width = `${targetSize}px`;
+                target.style.height = `${targetSize}px`;
+
+                if (targetSize <= 0) {
+                    clearInterval(shrinkInterval);
+                    moveTarget(); // Move to a new target if the user didn't click
+                    targetSize = 80; // Reset target size
+                }
+            }, 100); // Shrinks every 100ms
+        }
+
+        function submitScore(score) {
+            const name = prompt('Enter your name for the leaderboard:');
+            fetch('/submit-score', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name: name, score: score }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                window.location.href = '/leaderboard';  // Redirect to leaderboard page
+            });
+        }
+
+        // Start the game
+        moveTarget();
+        shrinkTarget(); // Start shrinking immediately
+    </script>
+</body>
+</html>
